@@ -1,24 +1,27 @@
 #ifndef _LINKTRACKER_H_
 #define _LINKTRACKER_H_ 1
+#include <vlc_common.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <vector>
-#include "LinkTrackerOberserver.h"
+#include "ILinkTrackerObserver.h"
+#include "LinkInfo.h"
 
 class LinkTracker{
 	public:
-		void attach();
-		void notify();
+		LinkTracker();
+		~LinkTracker();
+		void 	attach(ILinkTrackerObserver*);
+		static void* update(void *);
+		bool 	start();
+		static void* track(void *);
 	private:
-		std::vector<LinkTrackerOberserver> obs;
-		void update();
-		float 	BLER;
-		float 	MLB;
-		float 	SINR;
-		size_t 	UE_Num;
-		bool	moving;
-		bool	switching;
-		struct	predict;
+		std::vector<LinkTrackerObserver*> obs;
+		linkInfo* prevInfo;
+		linkInfo* curInfo;
+		vlc_thread_t linkTrackThread;
+		vlc_thread_t linkNotifyThread;
+		
 }
 #endif
